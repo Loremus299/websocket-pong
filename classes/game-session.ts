@@ -29,7 +29,11 @@ export class GameSession {
     ];
     this.id = createId();
     log.info({ sessionId: this.id });
-    currentSessions.add(this);
+    currentSessions.add(this, log);
+  }
+
+  get data() {
+    return this.players;
   }
 
   public updatePos({
