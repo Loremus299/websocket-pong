@@ -13,10 +13,10 @@ class CurrentSessions {
     this.sessions.push(session);
   }
 
-  public resolve(id: string, log: Logger): Result<string, Err> {
+  public resolve(id: string, log: Logger): Result<GameSession, Err> {
     const session = this.sessions.find((session) => session.id === id);
     if (session) {
-      return Result.ok(session.id);
+      return Result.ok(session);
     } else {
       return Result.error({
         status: 404,

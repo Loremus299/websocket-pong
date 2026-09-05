@@ -13,7 +13,46 @@ const wss = new WebSocketServer({ server });
 
 wss.on("connection", (ws, req) => {
   console.log("client connected from", req.socket.remoteAddress);
-  ws.on("message", (data) => ws.send(`echo: ${data}`));
+  ws.on("message", (data) => {
+    const input = JSON.parse(data.toString());
+    const log = new Logger();
+    log.info({ layer: "websocket message" });
+    log.info({ body: input });
+
+    log.trace({ op: "body validation" });
+    const schema = z.object({
+      session: z.string().min(1),
+      user: z.string().min(1),
+      type: z.enum(["add", "sub"]),
+    });
+    const values = schema.safeParse(input);
+    if (!values.success) {
+      return ws.send(
+        JSON.stringify({
+          error:
+            "Invalid body format, requires session, user, type as strings for player1 and player2",
+          log: log.id,
+        }),
+      );
+    }
+    const { session, user, type } = values.data;
+
+    log.trace({ op: "resolve session" });
+    const res = currentSessions.resolve(session, log);
+    if (res.isError()) {
+      return ws.send(
+        JSON.stringify({
+          error: "session not resolved",
+          log: log.id,
+        }),
+      );
+    }
+    if (res.isOk()) {
+      log.trace({ op: "update position" });
+      const activeSession = res.data;
+      activeSession.updatePos({ id: user, type, log });
+    }
+  });
   ws.on("close", () => console.log("client disconnected"));
 });
 
