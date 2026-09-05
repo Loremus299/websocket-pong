@@ -6,6 +6,7 @@ import z from "zod";
 import { Logger } from "./utils/logger";
 
 const app = express();
+app.use(express.json());
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
 
