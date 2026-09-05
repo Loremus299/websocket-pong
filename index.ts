@@ -47,13 +47,14 @@ app.post("/new", (req, res) => {
   }
 });
 
-app.get("current-sessions", (req, res) => {
+app.get("/current-sessions", (req, res) => {
   const log = new Logger();
   try {
     log.info({ layer: "GET on /current-sessions" });
     return res.json({ sessions: currentSessions.sessions });
   } finally {
+    log.dump();
   }
 });
 
-server.listen(5050);
+server.listen(5050, () => console.log("Server started"));
