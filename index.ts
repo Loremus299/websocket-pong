@@ -1,9 +1,16 @@
-import express, { type Express, type Request, type Response } from "express";
+import express from "express";
+import { createServer } from "http";
+import { WebSocketServer } from "ws";
 
-const app: Express = express();
+const app = express();
+const server = createServer(app);
+const wss = new WebSocketServer({ server });
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("HELLO FROM THE SERVER SIDE!");
+wss.on("connection", (ws, req) => {
+  console.log("client connected from", req.socket.remoteAddress);
+  ws.on("message", (data) => ws.send(`echo: ${data}`));
+  ws.on("close", () => console.log("client disconnected"));
 });
 
-app.listen(3000);
+app.get("/health", (_req, res) => res.json({ status: "ok" }));
+server.listen(3000);
