@@ -11,8 +11,7 @@ app.use(express.json());
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
 
-wss.on("connection", (ws, req) => {
-  console.log("client connected from", req.socket.remoteAddress);
+wss.on("connection", (ws, _req) => {
   ws.on("message", (data) => {
     const log = new Logger();
     try {
@@ -43,7 +42,7 @@ wss.on("connection", (ws, req) => {
       if (res.isError()) {
         return ws.send(
           JSON.stringify({
-            error: "session not resolved",
+            error: res.data.info,
             log: log.id,
           }),
         );
@@ -51,13 +50,25 @@ wss.on("connection", (ws, req) => {
       if (res.isOk()) {
         log.trace({ op: "update position" });
         const activeSession = res.data;
-        activeSession.updatePos({ id: user, type, log });
+        const pos = activeSession.updatePos({ id: user, type, log });
+        if (pos.isError()) {
+          return ws.send(
+            JSON.stringify({
+              error: pos.data.info,
+              log: log.id,
+            }),
+          );
+        }
+
+        if (pos.isOk()) {
+          return ws.send(JSON.stringify(activeSession.data));
+        }
       }
     } finally {
       log.dump();
     }
   });
-  ws.on("close", () => console.log("client disconnected"));
+  ws.on("close", () => {});
 });
 
 app.post("/new", (req, res) => {
