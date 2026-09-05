@@ -2,7 +2,6 @@ import express from "express";
 import { createServer } from "http";
 import { WebSocketServer } from "ws";
 import { GameSession } from "./classes/game-session";
-import { currentSessions } from "./classes/current-sessions";
 import z from "zod";
 import { Logger } from "./utils/logger";
 
