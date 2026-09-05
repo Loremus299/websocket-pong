@@ -3,7 +3,7 @@ import { Result, type Err } from "../utils/result";
 import type { Logger } from "../utils/logger";
 
 class CurrentSessions {
-  private readonly sessions: GameSession[];
+  readonly sessions: GameSession[];
 
   public constructor() {
     this.sessions = [];

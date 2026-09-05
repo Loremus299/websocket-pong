@@ -4,6 +4,7 @@ import { WebSocketServer } from "ws";
 import { GameSession } from "./classes/game-session";
 import z from "zod";
 import { Logger } from "./utils/logger";
+import { currentSessions } from "./classes/current-sessions";
 
 const app = express();
 app.use(express.json());
@@ -43,6 +44,15 @@ app.post("/new", (req, res) => {
     return res.json({ sessionId: session.id, log: log.id });
   } finally {
     log.dump();
+  }
+});
+
+app.get("current-sessions", (req, res) => {
+  const log = new Logger();
+  try {
+    log.info({ layer: "GET on /current-sessions" });
+    return res.json({ sessions: currentSessions.sessions });
+  } finally {
   }
 });
 
