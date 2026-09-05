@@ -21,6 +21,8 @@ export class GameSession {
     id2: string;
     log: Logger;
   }) {
+    log.trace({ layer: "new game session" });
+    log.debug({ id1, id2 });
     this.players = [
       { id: id1, position: 0.5 },
       { id: id2, position: 0.5 },
@@ -39,6 +41,8 @@ export class GameSession {
     type: "add" | "sub";
     log: Logger;
   }): Result<number, Err> {
+    log.trace({ layer: "update position" });
+    log.debug({ id, type });
     const player = this.players.find((i) => i.id == id);
     if (player) {
       if (type === "add") {
@@ -51,6 +55,7 @@ export class GameSession {
       }
       return Result.error({ status: 500, info: "invalid operation provided" });
     }
+    log.error({ error: "Player not found in the session" });
     return Result.error({
       status: 404,
       info: "Player not found in the session",
