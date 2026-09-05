@@ -1,5 +1,7 @@
+import { createId } from "@paralleldrive/cuid2";
 import { Result, type Err } from "../utils/result";
 import { currentSessions } from "./current-sessions";
+import type { Logger } from "../utils/logger";
 
 interface PlayerBody {
   id: string;
@@ -10,21 +12,32 @@ export class GameSession {
   private players: [PlayerBody, PlayerBody];
   readonly id: string;
 
-  public constructor({ id1, id2 }: { id1: string; id2: string }) {
+  public constructor({
+    id1,
+    id2,
+    log,
+  }: {
+    id1: string;
+    id2: string;
+    log: Logger;
+  }) {
     this.players = [
       { id: id1, position: 0.5 },
       { id: id2, position: 0.5 },
     ];
-    this.id = "1234";
+    this.id = createId();
+    log.info({ sessionId: this.id });
     currentSessions.add(this);
   }
 
   public updatePos({
     id,
     type,
+    log,
   }: {
     id: string;
     type: "add" | "sub";
+    log: Logger;
   }): Result<number, Err> {
     const player = this.players.find((i) => i.id == id);
     if (player) {

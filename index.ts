@@ -32,13 +32,14 @@ app.post("/new", (req, res) => {
       return res.status(400).json({
         error:
           "Invalid body format, requires id1 and id2 as strings for player1 and player2",
+        log: log.id,
       });
     }
     const { id1, id2 } = values.data;
 
     log.trace({ op: "creating session" });
-    const session = new GameSession({ id1, id2 });
-    return res.json({ sessionId: session.id });
+    const session = new GameSession({ id1, id2, log });
+    return res.json({ sessionId: session.id, log: log.id });
   } finally {
     log.dump();
   }

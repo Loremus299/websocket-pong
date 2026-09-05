@@ -1,5 +1,6 @@
 import type { GameSession } from "./game-session";
 import { Result, type Err } from "../utils/result";
+import type { Logger } from "../utils/logger";
 
 class CurrentSessions {
   private readonly sessions: GameSession[];
@@ -12,7 +13,7 @@ class CurrentSessions {
     this.sessions.push(session);
   }
 
-  public resolve(id: string): Result<string, Err> {
+  public resolve(id: string, log: Logger): Result<string, Err> {
     const session = this.sessions.find((session) => session.id === id);
     if (session) {
       return Result.ok(session.id);
